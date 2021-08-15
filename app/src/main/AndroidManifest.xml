@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.adminapplication">
+
+    <uses-feature android:name="android.hardware.nfc" android:required="true" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -11,9 +15,13 @@
         android:label="AdminApplication"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.UserApplication">
-        <activity android:name=".BulkCard"
-            android:screenOrientation="portrait" ></activity>
+        android:theme="@style/Theme.UserApplication"
+        tools:replace="android:allowBackup,android:label">
+        <activity android:name=".MainActivity2" />
+
+        <activity
+            android:name=".BulkCard"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".CheckSingleUser"
             android:screenOrientation="portrait" />

@@ -200,6 +200,24 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <Button
+                android:id="@+id/initializecard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerInParent="true"
+                android:background="@drawable/not_so_round_button"
+                android:fontFamily="@font/montserrat"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:text="Initialize Card"
+                android:textColor="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="1.0" />
+
+            <Button
                 android:id="@+id/bulkUser"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

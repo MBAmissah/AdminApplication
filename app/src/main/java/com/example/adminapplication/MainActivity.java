@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     String userID, accountEmail, accountID, accountFirstName, accountLastName;
     ImageButton mEditProfile, mSettings;
 
-    Button  singleUser, bulkUser;
+    Button  singleUser, bulkUser, initializeCard;
 
 
     @SuppressLint("SetTextI18n")
@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         mEditProfile = findViewById(R.id.editProfile);
         mSettings = findViewById(R.id.settings);
         singleUser = findViewById(R.id.singleUser);
+        initializeCard = findViewById(R.id.initializecard);
         bulkUser = findViewById(R.id.bulkUser);
         mId = findViewById(R.id.mId);
 
@@ -135,6 +136,13 @@ public class MainActivity extends AppCompatActivity {
         // go to single user
         singleUser.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, CheckSingleUser.class);
+            startActivity(intent);
+            finish();
+        });
+
+        // go to initialize card
+        initializeCard.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, MainActivity2.class);
             startActivity(intent);
             finish();
         });
