@@ -14,6 +14,8 @@ import com.nxp.nfclib.KeyType;
 import com.nxp.nfclib.NxpNfcLib;
 import com.nxp.nfclib.defaultimpl.KeyData;
 import com.nxp.nfclib.desfire.DESFireFactory;
+import com.nxp.nfclib.desfire.DESFireFile;
+import com.nxp.nfclib.desfire.EV2ApplicationKeySettings;
 import com.nxp.nfclib.desfire.IDESFireEV1;
 import com.nxp.nfclib.desfire.IDESFireEV2;
 import com.nxp.nfclib.utils.Utilities;
@@ -25,7 +27,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import static com.nxp.nfclib.CardType.DESFireEV2;
 
-public class MainActivity2 extends AppCompatActivity {
+public class InitializeCardActivity extends AppCompatActivity {
 
     ImageView tapCardGif;
     Button systemInitialize, formatCard;
@@ -34,6 +36,13 @@ public class MainActivity2 extends AppCompatActivity {
     private String TAG = MainActivity.class.getSimpleName();
     private final String m_strLicense = "f7bf27540bbc196fb41e3123884422c6";
     private NxpNfcLib m_libInstance = null;
+
+    public static final byte[] APP_KEY_AES =
+            {                                                    // New AES key
+                    (byte)0x1f, (byte)0x2f, (byte)0x3f, (byte)0x4f, (byte)0x5f, (byte)0x6f, (byte)0x7f,
+                    (byte)0x8f, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff,
+                    (byte)0xff, (byte)0xff
+            };
 
     public static final byte[] READ_KEY_AES_1 =
             {                                                    // AES key for file #1
@@ -166,6 +175,17 @@ public class MainActivity2 extends AppCompatActivity {
       Key keyDefault;
       KeyData keyDataDefault;
 
+       Key keyDefaultAES;
+       KeyData keyDataDefaultAES;
+
+      Key keyNew;
+      KeyData keyDataNew;
+
+       byte[] appId = new byte[]{0x12, 0x00, 0x00};
+       int fileSize = 100;
+       int balanceFile = 0;
+       int studentIdFile = 1;
+
       if( DESFireEV2 == m_libInstance.getCardType( intent ) )
       {
          IDESFireEV2 objDESFireEV2 = DESFireFactory.getInstance()
@@ -173,21 +193,68 @@ public class MainActivity2 extends AppCompatActivity {
          try
          {
             objDESFireEV2.getReader().connect();
+             objDESFireEV2.getReader().setTimeout(2000);
                                           //Read key for file #1
 
             keyDefault = new SecretKeySpec( DEFAULT_KEY_2K3DES, "DESede" );
             keyDataDefault = new KeyData();
             keyDataDefault.setKey( keyDefault );
 
+             keyDefaultAES = new SecretKeySpec( DEFAULT_KEY_AES, "AES" );
+             keyDataDefaultAES = new KeyData();
+             keyDataDefaultAES.setKey( keyDefaultAES );
+
+
+             keyNew = new SecretKeySpec( NEW_KEY_AES, "AES" );
+             keyDataNew = new KeyData();
+             keyDataNew.setKey( keyNew );
+
             // Address PICC Master Key
-            objDESFireEV2.selectApplication( 0 );
-            //Authenticate
+            objDESFireEV2.selectApplication( 0);
+            //Authenticate then format
             objDESFireEV2.authenticate( 0, IDESFireEV2.AuthType.Native, KeyType.THREEDES, keyDataDefault );
+             objDESFireEV2.format();
 
 
             //Change PICC Master Key
              objDESFireEV2.changeKey(0,KeyType.AES128, DEFAULT_KEY_2K3DES,NEW_KEY_AES,(byte)0);
+
+
+             EV2ApplicationKeySettings.Builder appsetbuilder = new EV2ApplicationKeySettings.Builder();
+             appsetbuilder
+                     .setAppKeySettingsChangeable(false)
+                     .setAppMasterKeyChangeable(true)
+                     .setAuthenticationRequiredForFileManagement(true)
+                     .setAuthenticationRequiredForDirectoryConfigurationData(true)
+                     .setKeyTypeOfApplicationKeys(KeyType.AES128);
+
+             EV2ApplicationKeySettings appsettings = appsetbuilder.build();
+
+             //Authenticate again
+             //objDESFireEV2.authenticate( 0, IDESFireEV2.AuthType.AES, KeyType.AES128, keyDataNew);
+
+             //create application and select it
+             objDESFireEV2.createApplication(appId, appsettings);
+             objDESFireEV2.selectApplication(appId);
+
+             //authenticate
+             objDESFireEV2.authenticate( 0, IDESFireEV2.AuthType.AES, KeyType.AES128, keyDataDefaultAES );
+
+             //create file number 0 & 1 with encrypted communication using key 0 for
+             // access permissions for “read access”, “write access”, combined“read and write access” and “change access” filesize 100
+             objDESFireEV2.createFile(balanceFile, new DESFireFile.StdDataFileSettings(
+                     IDESFireEV2.CommunicationType.Enciphered, (byte) 0, (byte) 0, (byte) 0, (byte) 0, fileSize));
+             objDESFireEV2.createFile(studentIdFile, new DESFireFile.StdDataFileSettings(
+                     IDESFireEV2.CommunicationType.Enciphered, (byte) 0, (byte) 0, (byte) 0, (byte) 0, fileSize));
+
+             //change application key
+             objDESFireEV2.changeKey(0,KeyType.AES128,DEFAULT_KEY_AES,APP_KEY_AES,(byte)0);
+
+
+
              Toast.makeText(this, "Card Initialized Successfully", Toast.LENGTH_SHORT).show();
+
+
 
              tapCardGif.setVisibility(View.INVISIBLE);
              initPressed = false;
@@ -264,5 +331,12 @@ public class MainActivity2 extends AppCompatActivity {
         else{
             Toast.makeText(this, "This card is not supported", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent setIntent = new Intent(InitializeCardActivity.this, MainActivity.class);
+        startActivity(setIntent);
+        finish();
     }
 }

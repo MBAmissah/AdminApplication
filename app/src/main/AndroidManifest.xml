@@ -3,7 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.adminapplication">
 
-    <uses-feature android:name="android.hardware.nfc" android:required="true" />
+    <uses-feature
+        android:name="android.hardware.nfc"
+        android:required="true" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.NFC" />
@@ -17,8 +19,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UserApplication"
         tools:replace="android:allowBackup,android:label">
-        <activity android:name=".MainActivity2" />
-
+        <activity android:name=".CheckSingleUserTapLinx"></activity>
+        <activity android:name=".InitializeCardActivity" />
         <activity
             android:name=".BulkCard"
             android:screenOrientation="portrait" />
